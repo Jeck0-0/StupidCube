@@ -10,24 +10,25 @@ public class GuiManager : MonoBehaviour
     public Text demotivationQuote;
 
     public GameManager gameManager;
+    public Serializer ser;
 
     public string[] demotivationQuotes;
 
 
     private void Start()
     {
-        if (PlayerPrefs.GetInt("Demotivate") == 0)
-        {
-            demotivationQuote.text = "";
-        }
-        else
+        if (ser.data.Demotivate)
         {
             demotivationQuote.text = demotivationQuotes[Random.Range(0, demotivationQuotes.Length)];
         }
+        else
+        {
+            demotivationQuote.text = "";
+        }
 
-        bestScoreText.text = PlayerPrefs.GetInt("BestScore", 0).ToString();
+        bestScoreText.text = ser.data.BestScore.ToString();
     }
-
+    
     private void Update()
     {
         scoreText.text = gameManager.score.ToString();

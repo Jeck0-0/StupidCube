@@ -6,21 +6,53 @@ public class PlayerMovementMobile : MonoBehaviour
 {
 
     public PlayerMovement playerMovement;
-    private bool clickedOnUI;
+    public GameManager gameManager;
+
+    bool lastTouchWasPause = false;
+
     void Update()
     {
-        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
-        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-        List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        if (gameManager.gameLost) return;
 
-        if (Input.touchCount > 0 && results.Count < 0)
+        if (Input.touchCount > 0)
         {
-            if (EventSystem.current.IsPointerOverGameObject())
+            
+            if (IsPointerOverUIObject() || lastTouchWasPause)
+            {
+                lastTouchWasPause = true;
                 return;
+            }
 
-            Touch touch = Input.GetTouch(0);
-            playerMovement.xPosition = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(touch.position).x);
+            if (gameManager.paused)
+            {
+                gameManager.Unpause();
+                lastTouchWasPause = false;
+            }
+            
+            playerMovement.xPosition = Mathf.Clamp(Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position).x), -2, 2);
+            return;
         }
+
+        lastTouchWasPause = false;
+        
     }
+
+    private bool IsPointerOverUIObject()
+    {
+        if (EventSystem.current.IsPointerOverGameObject())
+            return true;
+
+        if (EventSystem.current.currentSelectedGameObject != null)
+            return true;
+        
+        for (int touchIndex = 0; touchIndex < Input.touchCount; touchIndex++)
+        {
+            Touch touch = Input.GetTouch(touchIndex);
+            if (EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+                return true;
+        }
+
+        return false;
+    }
+
 }

@@ -2,15 +2,16 @@
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour
 {
     public bool gameLost = false;
     public bool paused = false;
-    
 
     public int score = 0;
 
+    public Camera camera;
     public Animator cameraAnimations;
     public GameObject LoseScreenUI;
     public GameObject pauseButton;
@@ -18,58 +19,87 @@ public class GameManager : MonoBehaviour
     public GameObject pauseMenu;
     public GameObject player;
     public GameObject countDown;
+    public GameObject playerTrailLine;
+    public GameObject playerTrailParticles;
 
+    public PlayerMovement playerMovement;
+    public Serializer ser;
     public PostProcessVolume postProcess;
 
     private float timer = 0f;
     public bool isUnpausing = false;
+    public bool pauseDelay = false;
     private float timeWhenPaused = 1;
 
     private void Awake()
     {
+        Camera.main.orthographicSize = 1.408f * 16f / 9f / camera.aspect;
+        ser.Deserialize();
+
         Time.timeScale = 1f;
-        if (PlayerPrefs.GetInt("Graphics", 0) == 1)
+
+        postProcess.enabled = ser.data.Graphics;
+        if (!ser.data.Graphics)
         {
-            postProcess.enabled = true;
+            Destroy(playerTrailLine);
+            Destroy(playerTrailParticles);
         }
+
+        ser.data.GamesPlayed++;
+        ser.Serialize();
     }
 
     private void Update()
     {
-        if (gameLost || paused) return;
-        
+        if (gameLost) return;
+
+        if (paused)
+        {
+            if (Input.GetKey(KeyCode.Mouse0) && !EventSystem.current.IsPointerOverGameObject() && !playerMovement.touchInput)
+                Unpause();
+
+            return;
+        }
+
+        ser.data.TimePlayed += Time.deltaTime;
+
         if (!isUnpausing)
         {
             timer += Time.deltaTime;
-            Time.timeScale = 1 + (timer / 120f - .25f);
         }
 
-        if (Input.GetKey(KeyCode.Escape))
+        if (Input.GetKey(KeyCode.Escape) || Input.GetKey(KeyCode.Menu) && pauseButton)
         {
             Pause();
         }
-        
+
     }
-    
 
-    public void Continue()
+    private void OnApplicationPause(bool isQuitting)
     {
-        StartCoroutine(SlowStart());
+        if (!gameLost && isQuitting && !paused)
+            Pause();
+    }
 
+    public void Unpause()
+    {
         paused = false;
 
-        pauseButton.SetActive(true);
+        StartCoroutine(SlowStart(10, true));
+        
         pauseMenu.SetActive(false);
     }
 
     public void Pause()
     {
+        if (paused || gameLost || !pauseButton.activeInHierarchy || Time.timeScale == 0f) return;
+        paused = true;
         if (!isUnpausing || gameLost)
             timeWhenPaused = Time.timeScale;
         Time.timeScale = 0f;
 
-        paused = true;
-
+        ser.Serialize();
+        
         pauseButton.SetActive(false);
         pauseMenu.SetActive(true);
     }
@@ -78,28 +108,39 @@ public class GameManager : MonoBehaviour
     {
         gameLost = true;
         timeWhenPaused = Time.timeScale;
-        StartCoroutine(SlowMo());
+        StartCoroutine(SlowStop());
         cameraAnimations.updateMode = AnimatorUpdateMode.Normal;
         cameraAnimations.SetTrigger("GameLost");
+        pauseMenu.SetActive(false);
         player.SetActive(false);
         LoseScreenUI.SetActive(true);
         pauseButton.SetActive(false);
+        ser.Serialize();
     }
 
     public void StartContinuePlaying()
     {
-        Debug.Log("Continue1");
-        StartCoroutine(ContinuePlaying());
+        this.StartCoroutine(ContinuePlaying());
+    }
+
+    public void AddScore(int qty = 1)
+    {
+        score++;
+        ser.data.totalScore++;
+
+        if(score > ser.data.BestScore)
+        {
+            ser.data.BestScore = score;
+        }
+        ser.Serialize();
+
+        Time.timeScale = 1 + (score / 120f - .2f);
     }
 
     public IEnumerator ContinuePlaying()
     {
-
-        Debug.Log("Continue2");
-
         LoseScreenUI.SetActive(false);
-        pauseButton.SetActive(true);
-        
+
         cameraAnimations.updateMode = AnimatorUpdateMode.UnscaledTime;
         cameraAnimations.SetTrigger("ContinuePlaying");
         
@@ -109,7 +150,7 @@ public class GameManager : MonoBehaviour
             e.OnContinuePlaying();
         }
 
-        Time.timeScale = 1f;
+        Time.timeScale = 1;
         player.SetActive(true);
 
         yield return new WaitForSecondsRealtime(1);
@@ -123,36 +164,34 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(3);
         countDown.SetActive(false);
-        StartCoroutine(SlowStart(30));
+        StartCoroutine(SlowStart(30, true, 4.5f));
         gameLost = false;
-    }
-
-    public void AddScore(int qty = 1)
-    {
-        score++;
-        if(score > PlayerPrefs.GetInt("BestScore", 0))
-        {
-            PlayerPrefs.SetInt("BestScore", score);
-            PlayerPrefs.Save();
-        }
     }
 
     
 
-    IEnumerator SlowStart(int speed = 15)
+    IEnumerator SlowStart(int speed, bool activatePauseButton, float afterSeconds = 7.5f)
     {
         isUnpausing = true;
-        for (int i = 0; i < speed; i++)
+        for (int i = 0; i < speed && !paused; i++)
         {
-            if (paused) break;
-
-            Time.timeScale += timeWhenPaused / speed;
+            Time.timeScale = timeWhenPaused / speed * i;
             yield return new WaitForSecondsRealtime(.1f);
         }
         isUnpausing = false;
-    }
 
-    IEnumerator SlowMo()
+        if(activatePauseButton && !paused)
+        {
+            yield return new WaitForSeconds(afterSeconds);
+
+            if(!gameLost && !paused)
+                pauseButton.SetActive(true);
+        }
+    }
+    
+
+
+    IEnumerator SlowStop()
     {
         while(Time.timeScale > 0.06f)
         {

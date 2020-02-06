@@ -55,6 +55,8 @@ public class AdManager : MonoBehaviour, IUnityAdsListener
             {
                 if (result == ShowResult.Finished)
                 {
+                    canRetry = false;
+                    adToComtinueButton.interactable = false;
                     gameManager.StartContinuePlaying();
                 }
                 else if (result == ShowResult.Skipped)
@@ -72,7 +74,7 @@ public class AdManager : MonoBehaviour, IUnityAdsListener
         }
     }
 
-    public void AdToContinue(int rew = 0)
+    public void WatchAd(int rew = 0)
     {
         Advertisement.Show(placementId);
         reward = rew;

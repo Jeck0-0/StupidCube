@@ -5,17 +5,24 @@ public class EnemySpawner : MonoBehaviour
 {
     public float[] TimeBetweenWaves = new float[2] { 2f, 3f };
 
+    public float timeBeforeFirstWave = 2.25f;
 
-    public GameObject normalEnemy;
-    public GameObject fastEnemy;
-    public GameObject slowEnemy;
+    public GameObject lNormalEnemy;
+    public GameObject lFastEnemy;
+    public GameObject lSlowEnemy;
+
+    public GameObject hNormalEnemy;
+    public GameObject hFastEnemy;
+    public GameObject hSlowEnemy;
+
     public GameObject laserEnemy;
 
     public Spawnpoints topSpawnpoints;
     public Spawnpoints bottomSpawnpoints;
 
     public GameManager gameManager = null;
-
+    public Serializer serializer;
+    
     private bool gameLost = false;
 
     [HideInInspector]
@@ -38,6 +45,7 @@ public class EnemySpawner : MonoBehaviour
 
     IEnumerator SpawnDelay()
     {
+        yield return new WaitForSecondsRealtime(timeBeforeFirstWave);
         while (true)
         {
             if (!gameLost)
@@ -72,7 +80,7 @@ public class EnemySpawner : MonoBehaviour
 
     IEnumerator SpawnNormalWave()
     {
-        for(int i = 5; i > 0; i--)
+        for(int i = 0; i < 4; i++)
         {
             GameObject enemyToSpawn = EnemyToSpawn();
             if (enemyToSpawn != null)
@@ -100,17 +108,26 @@ public class EnemySpawner : MonoBehaviour
     {
         int r = Random.Range(1, 101);
         
-        if (r > 95 - Mathf.Clamp(totalTimer / 5, 0, 15))
+        if (r > 95 - Mathf.Clamp(totalTimer / 5, 0, 20))
         {
-            return slowEnemy;
+            if (serializer.data.Graphics)
+                return hSlowEnemy;
+            else
+                return lSlowEnemy;
         }
-        else if (r > 85 - Mathf.Clamp(totalTimer / 5, 0, 20))
+        else if (r > 85 - Mathf.Clamp(totalTimer / 5, 0, 17))
         {
-            return fastEnemy;
+            if (serializer.data.Graphics)
+                return hFastEnemy;
+            else
+                return lFastEnemy;
         }
-        else if (r > 50 - Mathf.Clamp(totalTimer / 5, 0, 25))
+        else if (r > 50 - Mathf.Clamp(totalTimer / 5, 0, 15))
         {
-            return normalEnemy;
+            if (serializer.data.Graphics)
+                return hNormalEnemy;
+            else
+                return lNormalEnemy;
         }
 
         return null;

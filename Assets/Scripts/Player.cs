@@ -6,10 +6,10 @@ public class Player : MonoBehaviour
     public GameObject enemyHitEffect;
     public GameObject deathParticles;
     public GameManager gameManager;
-    public GameObject activeHitEffect;
-    public GameObject activeDeathParticles;
 
-
+    private GameObject activeHitEffect;
+    private GameObject activeDeathParticles;
+    
     bool isInvincible = false;
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -28,6 +28,7 @@ public class Player : MonoBehaviour
             Debug.Log("Enemy Hit");
         }
     }
+    
 
     public void SetInvincible(float seconds)
     {

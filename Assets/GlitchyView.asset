@@ -16,10 +16,8 @@ MonoBehaviour:
   - {fileID: 114499418092911364}
   - {fileID: 114767862862207000}
   - {fileID: 114216730614213868}
-  - {fileID: 114396506694396082}
   - {fileID: 114863861021004342}
   - {fileID: 114685070228273108}
-  - {fileID: 114997026820035524}
 --- !u!114 &114216730614213868
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -37,7 +35,7 @@ MonoBehaviour:
     overrideState: 1
     value: 1
   spectralLut:
-    overrideState: 1
+    overrideState: 0
     value: {fileID: 0}
     defaultState: 1
   intensity:
@@ -46,34 +44,6 @@ MonoBehaviour:
   fastMode:
     overrideState: 1
     value: 1
---- !u!114 &114396506694396082
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d65e486e4de6e5448a8fbb43dc8756a0, type: 3}
-  m_Name: Grain
-  m_EditorClassIdentifier: 
-  active: 1
-  enabled:
-    overrideState: 1
-    value: 1
-  colored:
-    overrideState: 1
-    value: 1
-  intensity:
-    overrideState: 1
-    value: 0.3
-  size:
-    overrideState: 1
-    value: 2
-  lumContrib:
-    overrideState: 1
-    value: 0.916
 --- !u!114 &114499418092911364
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -248,25 +218,3 @@ MonoBehaviour:
   quality:
     overrideState: 0
     value: 2
---- !u!114 &114997026820035524
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b94fcd11afffcb142908bfcb1e261fba, type: 3}
-  m_Name: MotionBlur
-  m_EditorClassIdentifier: 
-  active: 1
-  enabled:
-    overrideState: 1
-    value: 1
-  shutterAngle:
-    overrideState: 1
-    value: 6
-  sampleCount:
-    overrideState: 1
-    value: 4
