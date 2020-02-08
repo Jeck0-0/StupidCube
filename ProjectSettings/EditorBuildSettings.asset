@@ -9,6 +9,6 @@ EditorBuildSettings:
     path: Assets/MainMenu.unity
     guid: 46bdadde4c8fa894da4e419432aaca93
   - enabled: 1
-    path: Assets/NormalGame.unity
+    path: Assets/Freee.unity
     guid: d37959e4eea42cc49ac75bac03c1c4cd
   m_configObjects: {}

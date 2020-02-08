@@ -50,7 +50,6 @@ public class Enemy : MonoBehaviour
     
     public void OnContinuePlaying()
     {
-        canMove = false;
         Destroy(gameObject, 1);
     }
 

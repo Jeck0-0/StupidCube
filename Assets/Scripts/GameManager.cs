@@ -29,11 +29,9 @@ public class GameManager : MonoBehaviour
     private float timer = 0f;
     public bool isUnpausing = false;
     public bool pauseDelay = false;
-    private float timeWhenPaused = 1;
 
     private void Awake()
     {
-        Camera.main.orthographicSize = 1.408f * 16f / 9f / camera.aspect;
         ser.Deserialize();
 
         Time.timeScale = 1f;
@@ -51,6 +49,8 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        Camera.main.orthographicSize = 2.503f / camera.aspect; // would be 1.408f * 16f / 9f
+
         if (gameLost) return;
 
         if (paused)
@@ -94,8 +94,6 @@ public class GameManager : MonoBehaviour
     {
         if (paused || gameLost || !pauseButton.activeInHierarchy || Time.timeScale == 0f) return;
         paused = true;
-        if (!isUnpausing || gameLost)
-            timeWhenPaused = Time.timeScale;
         Time.timeScale = 0f;
 
         ser.Serialize();
@@ -107,7 +105,6 @@ public class GameManager : MonoBehaviour
     public void LoseGame()
     {
         gameLost = true;
-        timeWhenPaused = Time.timeScale;
         StartCoroutine(SlowStop());
         cameraAnimations.updateMode = AnimatorUpdateMode.Normal;
         cameraAnimations.SetTrigger("GameLost");
@@ -151,10 +148,10 @@ public class GameManager : MonoBehaviour
         }
 
         Time.timeScale = 1;
-        player.SetActive(true);
 
         yield return new WaitForSecondsRealtime(1);
         
+        player.SetActive(true);
         player.transform.rotation = Quaternion.identity;
         player.GetComponent<Player>().SetInvincible(0f);
         player.GetComponent<Player>().DestroyEffects();
@@ -173,9 +170,10 @@ public class GameManager : MonoBehaviour
     IEnumerator SlowStart(int speed, bool activatePauseButton, float afterSeconds = 7.5f)
     {
         isUnpausing = true;
+        float timeToReach = 1 + (score / 120f - .2f);
         for (int i = 0; i < speed && !paused; i++)
         {
-            Time.timeScale = timeWhenPaused / speed * i;
+            Time.timeScale = timeToReach / speed * i;
             yield return new WaitForSecondsRealtime(.1f);
         }
         isUnpausing = false;

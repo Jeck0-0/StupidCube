@@ -71,6 +71,7 @@ public class PlayerMovement : MonoBehaviour
         speed = speedBeforeFreezing;
         if (resetPos)
         {
+            touchInput = true;
             xPosition = defaultPositionX;
         }
     }
