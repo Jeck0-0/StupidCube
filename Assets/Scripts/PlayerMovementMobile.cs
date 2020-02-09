@@ -28,8 +28,8 @@ public class PlayerMovementMobile : MonoBehaviour
                 gameManager.Unpause();
                 lastTouchWasPause = false;
             }
-            
-            playerMovement.xPosition = Mathf.Clamp(Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position).x), -2, 2);
+
+            playerMovement.xPosition = Mathf.Clamp(Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position).x), -(gameManager.lanes - 1) / 2, (gameManager.lanes - 1) / 2);
             return;
         }
 

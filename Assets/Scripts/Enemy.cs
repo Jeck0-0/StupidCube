@@ -48,10 +48,12 @@ public class Enemy : MonoBehaviour
         }
     }
     
-    public void OnContinuePlaying()
+    public void Destroy(float time = 0f)
     {
-        Destroy(gameObject, 1);
+        Destroy(gameObject, time);
     }
+
+    
 
     public bool canGivePoint()
     {

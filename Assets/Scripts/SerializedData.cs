@@ -8,6 +8,8 @@ public class SerializedData
 {
     public bool Demotivate;
     public bool Graphics;
+    public int lanes;
+    public int difficulty;
 
     public int totalScore;
     public int BestScore;

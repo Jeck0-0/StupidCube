@@ -29,7 +29,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.touchCount == 0 && !touchInput)
         {
-            xPosition = Mathf.Clamp(Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).x), -2, 2);
+            xPosition = Mathf.Clamp(Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).x), -(gameManager.lanes - 1) / 2, (gameManager.lanes - 1) / 2);
         }
         else
         {

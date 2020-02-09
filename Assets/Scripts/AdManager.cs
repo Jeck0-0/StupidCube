@@ -6,78 +6,71 @@ using UnityEngine.Advertisements;
 
 public class AdManager : MonoBehaviour, IUnityAdsListener
 {
-    public GameManager gameManager = null;
-    public Button adToComtinueButton = null;
+    public AdReward adReward;
+    public bool testMode = false;
 
-    private bool canRetry = true;
+    static int nscene = 0;
 
-    private int reward = 0;
-
+#if UNITY_IOS
+    private string adID = "3447012";
+#elif UNITY_ANDROID
     private string adID = "3447013";
+#endif
+
     private string placementId = "rewardedVideo";
 
     void Start()
     {
-        Advertisement.AddListener(this);
-        Advertisement.Initialize(adID, true);
-    }
+        adReward = FindObjectOfType<AdReward>();
 
-    private void Update()
-    {
-        if(canRetry)
-            adToComtinueButton.interactable = Advertisement.IsReady(placementId);    
-    }
-
-    public void OnUnityAdsReady(string id)
-    {
-        // If the ready Placement is rewarded, activate the button:
-        if (adToComtinueButton != null && id == placementId)
+        if (nscene == 0)
         {
-            adToComtinueButton.interactable = true;
+            Advertisement.AddListener(this);
+            Advertisement.Initialize(adID, testMode);
         }
+        nscene++;
+
+        Debug.Log(nscene);
     }
+
 
     public void OnUnityAdsDidError(string message)
     {
-        Debug.LogError("Ad error idk wtf");
+        adReward.AdError();
     }
 
     public void OnUnityAdsDidStart(string placementId)
     {
-        Debug.Log("Starting an ad");
+        adReward.AdStarted();
+    }
+
+    public void OnUnityAdsReady(string pId)
+    {
+        //keep this, ik it looks useless but keep this
     }
 
     public void OnUnityAdsDidFinish(string id, ShowResult result)
     {
+        adReward = FindObjectOfType<AdReward>();
+
         if (result == ShowResult.Finished)
         {
-            if (reward == 1)
-            {
-                if (result == ShowResult.Finished)
-                {
-                    canRetry = false;
-                    adToComtinueButton.interactable = false;
-                    gameManager.StartContinuePlaying();
-                }
-                else if (result == ShowResult.Skipped)
-                {
-                    canRetry = false;
-                    adToComtinueButton.interactable = false;
-                    gameManager.StartContinuePlaying();
-
-                }
-                else if (result == ShowResult.Failed)
-                {
-                    Debug.LogError("Video failed to show");
-                }
-            }
+            adReward.Reward(2);
         }
-    }
+        else if (result == ShowResult.Skipped)
+        {
+            adReward.Reward(1);
+        }
+        else if (result == ShowResult.Failed)
+        {
+            adReward.Reward(0);
+        }
+    } 
 
     public void WatchAd(int rew = 0)
     {
         Advertisement.Show(placementId);
-        reward = rew;
+        adReward.reward = rew;
     }
     
 }

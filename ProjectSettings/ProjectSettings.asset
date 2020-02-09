@@ -268,7 +268,7 @@ PlayerSettings:
   AndroidEnableTango: 0
   androidEnableBanner: 1
   androidUseLowAccuracyLocation: 0
-  androidUseCustomKeystore: 1
+  androidUseCustomKeystore: 0
   m_AndroidBanners:
   - width: 320
     height: 180
@@ -759,7 +759,7 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   cloudProjectId: 80242e23-090e-4997-af45-fd1e0e2b9a33
   framebufferDepthMemorylessMode: 0
-  projectName: BoringGame
+  projectName: StupidCube
   organizationId: jrubboli
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0

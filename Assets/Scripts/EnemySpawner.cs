@@ -6,6 +6,7 @@ public class EnemySpawner : MonoBehaviour
     public float[] TimeBetweenWaves = new float[2] { 2f, 3f };
 
     public float timeBeforeFirstWave = 2.25f;
+    public float defaultLaserDistance = 4.2f;
 
     public GameObject lNormalEnemy;
     public GameObject lFastEnemy;
@@ -15,7 +16,7 @@ public class EnemySpawner : MonoBehaviour
     public GameObject hFastEnemy;
     public GameObject hSlowEnemy;
 
-    public GameObject laserEnemy;
+    public GameObject LaserEnemy;
 
     public Spawnpoints topSpawnpoints;
     public Spawnpoints bottomSpawnpoints;
@@ -24,12 +25,14 @@ public class EnemySpawner : MonoBehaviour
     public Serializer serializer;
     
     private bool gameLost = false;
+    private int lanes = 5;
 
     [HideInInspector]
     public float totalTimer = 0f;
 
     void Start()
     {
+        Camera.main.orthographicSize = 2.5f / Camera.main.aspect;
         StartCoroutine(SpawnDelay());
         SpawnNormalWave();
     }
@@ -39,7 +42,10 @@ public class EnemySpawner : MonoBehaviour
         totalTimer += Time.deltaTime;
 
         if (gameManager != null)
+        {
+            lanes = gameManager.lanes;
             gameLost = gameManager.gameLost;
+        }
 
     }
 
@@ -67,11 +73,11 @@ public class EnemySpawner : MonoBehaviour
     public int SpawnLaser()
     {
         int lasers = 0;
-        for (int i = 0; i < Random.Range(1, 4); i++)
+        for (int i = 0; i < Random.Range(1, lanes - ((lanes-1)/2)); i++)
         {
-            Transform spawnPoint = ChooseSpawnPoint();
-            GameObject laser = Instantiate(laserEnemy, spawnPoint.position - Vector3.up * spawnPoint.position.y, spawnPoint.rotation);
-            Destroy(laser, 8f);
+            Vector3 spawnpoint = ChooseSpawnPoint();
+            GameObject laser = Instantiate(LaserEnemy, spawnpoint - Vector3.up * spawnpoint.y, Quaternion.identity);
+            Destroy(laser, 4.1f);
             lasers = i;
         }
         return lasers;
@@ -80,27 +86,26 @@ public class EnemySpawner : MonoBehaviour
 
     IEnumerator SpawnNormalWave()
     {
-        for(int i = 0; i < 4; i++)
+        for(int i = 0; i < lanes - 1; i++)
         {
             GameObject enemyToSpawn = EnemyToSpawn();
             if (enemyToSpawn != null)
             {
-                Transform spawnPoint = ChooseSpawnPoint();
-                Instantiate(enemyToSpawn, spawnPoint.position, spawnPoint.rotation);
+                Instantiate(enemyToSpawn, ChooseSpawnPoint(), Quaternion.identity);
                 yield return new WaitForSeconds(Random.Range(0f, .1f));
             }
         }
     }
 
-    private Transform ChooseSpawnPoint()
+    private Vector3 ChooseSpawnPoint()
     {
         if (Random.Range(0, 2) == 0)
         {
-            return topSpawnpoints.points[Random.Range(0, topSpawnpoints.points.Length)];
+            return new Vector3(Random.Range(-(lanes - 1) / 2, (lanes + 1) / 2), (lanes + 1) / 2 / Camera.main.aspect);
         }
         else
         {
-            return bottomSpawnpoints.points[Random.Range(0, bottomSpawnpoints.points.Length)];
+            return new Vector3(Random.Range(-(lanes - 1) / 2, (lanes + 1) / 2), - (lanes + 1) / 2 / Camera.main.aspect);
         }
     }
 
